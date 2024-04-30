@@ -3,9 +3,6 @@ SF-Muni-Route-Guide/
 ├── README.md
 ├── .gitignore
 │
-├── data/
-│   ├── routes.csv         # Exported dataset if needed locally
-│
 ├── docs/
 │   ├── project_proposal.pdf
 │   ├── final_report.pdf
