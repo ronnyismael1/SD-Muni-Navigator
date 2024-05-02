@@ -39,32 +39,76 @@ GROUP BY t.route_id, t.trip_headsign
 ORDER BY start_time
 LIMIT 30;
 
--- Query 4: Find transit stops
--- Find general stop name, location, and arrival time
-SELECT s.stop_id, s.stop_name, s.stop_lat, s.stop_lon, st.arrival_time
-FROM `bigquery-public-data.san_francisco_transit_muni.stops` s
-JOIN `bigquery-public-data.san_francisco_transit_muni.stop_times` st ON s.stop_id = CAST(st.stop_id AS STRING)
-JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON CAST(st.trip_id AS STRING) = t.trip_id
+
+--Query 4: Find all routes that have transportation type 3 
+-- Allow user's to find type 3 transportation for restrictions they may have
+SELECT tm.route_id, tm.route_long_name, tm.route_type  
+FROM `bigquery-public-data.san_francisco_transit_muni.routes` tm
+WHERE tm.route_type = "3"
 LIMIT 100
 
--- Query 5: To find routes serving specific route
--- Used for query 6
-SELECT DISTINCT r.route_id, r.route_short_name, r.route_long_name
+
+
+--Query 5: Calender Availability and Fares
+-- Checks availibity of Sunday's scheduling and if available the corresponding prices for Child Ticket
+SELECT
+  c.service_desc AS Service_Description,
+  c.sunday AS Service_On_Sunday,
+  f.price AS Child_Ticket_Price
+FROM 
+  `bigquery-public-data.san_francisco_transit_muni.calendar` c
+CROSS JOIN 
+  `bigquery-public-data.san_francisco_transit_muni.fares` f
+WHERE 
+  c.sunday = TRUE  -- Ensuring the service is available on Sunday
+  AND f.rider_desc = 'Child';  -- Focusing on Child ticket pricing
+
+
+
+-- Query 6: Find distinct stops along route 'M'
+-- Distinct stops along a specific route ('M'): This provides detailed stop information for a specific route, including geographical coordinates and sequence, which is good for mapping or guiding purposes.
+SELECT DISTINCT s.stop_id, s.stop_name, s.stop_lat, s.stop_lon, st.stop_sequence
 FROM `bigquery-public-data.san_francisco_transit_muni.routes` r
 JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON r.route_id = t.route_id
 JOIN `bigquery-public-data.san_francisco_transit_muni.stop_times` st ON t.trip_id = CAST(st.trip_id AS STRING)
 JOIN `bigquery-public-data.san_francisco_transit_muni.stops` s ON CAST(st.stop_id AS STRING) = s.stop_id
-WHERE s.stop_name = '101 Dakota St' -- Replace with the route you are interested in
-ORDER BY r.route_short_name
-LIMIT 15;
+WHERE r.route_short_name = 'M'  -- Replace 'M' with the route short name you are interested in
+ORDER BY st.stop_sequence
+LIMIT 50;
 
--- Query 6: Schedule for '101 Dakota St' on route '10'
--- Schedule for a specific stop ('101 Dakota St') on a specific route ('10'): This gives you the arrival and departure times at a key station for a specific route, good for users planning to use that route.
-SELECT t.route_id, s.stop_name, st.arrival_time, st.departure_time
-FROM `bigquery-public-data.san_francisco_transit_muni.stop_times` st
+
+--Query 7: Find all routes that have transportation type 3 
+-- Allow user's to find type 3 transportation for restrictions they may have
+SELECT tm.route_id, tm.route_long_name, tm.route_type  
+FROM `bigquery-public-data.san_francisco_transit_muni.routes` tm
+WHERE tm.route_type = "3"
+LIMIT 100
+
+
+
+--Query 8: Calender Availability and Fares
+-- Checks availibity of Sunday's scheduling and if available the corresponding prices for Child Ticket
+SELECT
+  c.service_desc AS Service_Description,
+  c.sunday AS Service_On_Sunday,
+  f.price AS Child_Ticket_Price
+FROM 
+  `bigquery-public-data.san_francisco_transit_muni.calendar` c
+CROSS JOIN 
+  `bigquery-public-data.san_francisco_transit_muni.fares` f
+WHERE 
+  c.sunday = TRUE  -- Ensuring the service is available on Sunday
+  AND f.rider_desc = 'Child';  -- Focusing on Child ticket pricing
+
+
+
+-- Query 9: Find distinct stops along route 'M'
+-- Distinct stops along a specific route ('M'): This provides detailed stop information for a specific route, including geographical coordinates and sequence, which is good for mapping or guiding purposes.
+SELECT DISTINCT s.stop_id, s.stop_name, s.stop_lat, s.stop_lon, st.stop_sequence
+FROM `bigquery-public-data.san_francisco_transit_muni.routes` r
+JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON r.route_id = t.route_id
+JOIN `bigquery-public-data.san_francisco_transit_muni.stop_times` st ON t.trip_id = CAST(st.trip_id AS STRING)
 JOIN `bigquery-public-data.san_francisco_transit_muni.stops` s ON CAST(st.stop_id AS STRING) = s.stop_id
-JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON CAST(st.trip_id AS STRING) = t.trip_id
-JOIN `bigquery-public-data.san_francisco_transit_muni.routes` r ON t.route_id = r.route_id
-WHERE s.stop_name = '101 Dakota St' AND r.route_short_name = '10'  -- Replace '10' and '101 Dakota St' as needed
-ORDER BY st.arrival_time
-LIMIT 25;
+WHERE r.route_short_name = 'M'  -- Replace 'M' with the route short name you are interested in
+ORDER BY st.stop_sequence
+LIMIT 50;
