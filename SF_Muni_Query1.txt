@@ -1,3 +1,6 @@
+-- Query 1: Display Routes of type "3" transportation
+-- User has limited transportation choices they can use and this query will allow them to know the routes that they have transportation (type 3 in this case) they can use
+
 SELECT tm.route_id, tm.route_long_name, tm.route_type  
 FROM `bigquery-public-data.san_francisco_transit_muni.routes` tm
 WHERE tm.route_type = "3"
