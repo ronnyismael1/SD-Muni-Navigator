@@ -38,3 +38,33 @@ WHERE CAST(st.stop_id AS STRING) IN (SELECT stop_id FROM `bigquery-public-data.s
 GROUP BY t.route_id, t.trip_headsign
 ORDER BY start_time
 LIMIT 30;
+
+-- Query 4: Find transit stops
+-- Find general stop name, location, and arrival time
+SELECT s.stop_id, s.stop_name, s.stop_lat, s.stop_lon, st.arrival_time
+FROM `bigquery-public-data.san_francisco_transit_muni.stops` s
+JOIN `bigquery-public-data.san_francisco_transit_muni.stop_times` st ON s.stop_id = CAST(st.stop_id AS STRING)
+JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON CAST(st.trip_id AS STRING) = t.trip_id
+LIMIT 100
+
+-- Query 5: To find routes serving specific route
+-- Used for query 6
+SELECT DISTINCT r.route_id, r.route_short_name, r.route_long_name
+FROM `bigquery-public-data.san_francisco_transit_muni.routes` r
+JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON r.route_id = t.route_id
+JOIN `bigquery-public-data.san_francisco_transit_muni.stop_times` st ON t.trip_id = CAST(st.trip_id AS STRING)
+JOIN `bigquery-public-data.san_francisco_transit_muni.stops` s ON CAST(st.stop_id AS STRING) = s.stop_id
+WHERE s.stop_name = '101 Dakota St' -- Replace with the route you are interested in
+ORDER BY r.route_short_name
+LIMIT 15;
+
+-- Query 6: Schedule for '101 Dakota St' on route '10'
+-- Schedule for a specific stop ('101 Dakota St') on a specific route ('10'): This gives you the arrival and departure times at a key station for a specific route, good for users planning to use that route.
+SELECT t.route_id, s.stop_name, st.arrival_time, st.departure_time
+FROM `bigquery-public-data.san_francisco_transit_muni.stop_times` st
+JOIN `bigquery-public-data.san_francisco_transit_muni.stops` s ON CAST(st.stop_id AS STRING) = s.stop_id
+JOIN `bigquery-public-data.san_francisco_transit_muni.trips` t ON CAST(st.trip_id AS STRING) = t.trip_id
+JOIN `bigquery-public-data.san_francisco_transit_muni.routes` r ON t.route_id = r.route_id
+WHERE s.stop_name = '101 Dakota St' AND r.route_short_name = '10'  -- Replace '10' and '101 Dakota St' as needed
+ORDER BY st.arrival_time
+LIMIT 25;
