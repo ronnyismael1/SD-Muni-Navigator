@@ -92,6 +92,7 @@ CROSS JOIN
 WHERE 
   c.sunday = TRUE  -- Ensuring the service is available on Sunday
   AND f.rider_desc = 'Child';  -- Focusing on Child ticket pricing
+LIMIT 100;
 
 
 
