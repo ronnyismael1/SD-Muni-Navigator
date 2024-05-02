@@ -1,0 +1,4 @@
+SELECT tm.route_id, tm.route_long_name, tm.route_type  
+FROM `bigquery-public-data.san_francisco_transit_muni.routes` tm
+WHERE tm.route_type = "3"
+LIMIT 100
