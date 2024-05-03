@@ -38,6 +38,8 @@ WHERE CAST(st.stop_id AS STRING) IN (SELECT stop_id FROM `bigquery-public-data.s
 GROUP BY t.route_id, t.trip_headsign
 ORDER BY start_time
 LIMIT 30;
+
+
 -- Query 3 OPTIMIZED
 WITH SelectedStops AS (
   SELECT stop_id, stop_name
